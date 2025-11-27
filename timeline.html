@@ -118,13 +118,13 @@
       resultBox.classList.add("safe");
       icon.innerHTML = "✅";
       text.innerHTML = "YOU ARE SAFE";
-      detail.innerHTML = "You have enough time for Standard Production.";
+      detail.innerHTML = "You have enough time! <b>Please select this date in the field below to confirm.</b>";
     } 
     else if (diffDays >= 14) {
       resultBox.classList.add("rush");
       icon.innerHTML = "⚠️";
       text.innerHTML = "RUSH FEE ZONE";
-      detail.innerHTML = "You are cutting it close. Rush Fee applies.";
+      detail.innerHTML = "You are cutting it close. $250 Rush Fee applies.";
     } 
     else {
       resultBox.classList.add("late");
