@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bujified Design Kiosk</title>
+    <style>
+        /* RESET & BASICS */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; font-family: 'Helvetica Neue', Arial, sans-serif; }
+
+        /* 1. SCREENSAVER (THE SLEEP SCREEN) */
+        #screensaver {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; 
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease-in-out, visibility 0.6s;
+            cursor: pointer;
+        }
+        
+        /* Hidden state class */
+        #screensaver.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* LOGO ANIMATION (Pulse) */
+        #screensaver img {
+            max-width: 60%; 
+            max-height: 40vh;
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        /* TEXT ANIMATION */
+        .tap-text {
+            color: #fff;
+            margin-top: 50px;
+            font-size: 24px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: bold;
+            animation: fadeText 2s infinite;
+        }
+
+        /* 2. THE APP (EMBEDDED STUDIO) */
+        #app-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            background: #fff;
+        }
+
+        /* 3. SECRET FULLSCREEN BUTTON (Bottom Right Corner) */
+        #fs-btn {
+            position: fixed;
+            bottom: 0; right: 0;
+            width: 50px; height: 50px;
+            background: transparent;
+            z-index: 10000;
+            cursor: none; /* Invisible to user */
+        }
+
+        /* ANIMATIONS */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+        @keyframes fadeText {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="screensaver" onclick="wakeUp()">
+        <img src="https://images.square.site/uploads/1/3188/66D1/1672535451684-2T2T2T2T/Bujified_Logo_White.png" 
+             alt="Bujified Hawaii">
+        
+        <div class="tap-text">Touch Screen to Start Design</div>
+    </div>
+
+    <iframe id="app-frame" src="https://customthings.com/v2/in-store/shop/750669022704645" allow="camera; microphone"></iframe>
+
+    <div id="fs-btn" onclick="toggleFullScreen()"></div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const idleLimitMinutes = 3; // Reset time in minutes
+        // ---------------------
+
+        let idleTime = 0;
+        const screensaver = document.getElementById('screensaver');
+        const appFrame = document.getElementById('app-frame');
+        const idleLimitSeconds = idleLimitMinutes * 60;
+
+        // 1. WAKE FUNCTION
+        function wakeUp() {
+            screensaver.classList.add('hidden');
+            resetTimer();
+        }
+
+        // 2. SLEEP FUNCTION
+        function goSleep() {
+            if (screensaver.classList.contains('hidden')) {
+                screensaver.classList.remove('hidden');
+                
+                // Refresh to clear previous customer's data
+                setTimeout(() => {
+                    appFrame.src = appFrame.src;
+                }, 1000); 
+            }
+        }
+
+        // 3. IDLE TIMER
+        function timerIncrement() {
+            idleTime++;
+            if (idleTime >= idleLimitSeconds) {
+                goSleep();
+                idleTime = 0;
+            }
+        }
+        
+        // Count every second
+        setInterval(timerIncrement, 1000); 
+
+        // 4. RESET TIMER ON ACTIVITY
+        function resetTimer() {
+            idleTime = 0;
+        }
+
+        // Listen for interaction
+        window.onload = resetTimer;
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+        document.ontouchstart = resetTimer;
+        document.onclick = resetTimer;
+
+        // 5. FULL SCREEN TOGGLE
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>
